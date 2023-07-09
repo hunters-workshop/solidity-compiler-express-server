@@ -9,7 +9,7 @@ const cors = require('cors');
 
 const app = express();
 app.use(cors({
-  origin: '*',
+  origin: ['http://localhost:8080', 'https://superfluid-wizard.hunters-workshop.xyz'],
 }));
 app.use(express.json());
 
