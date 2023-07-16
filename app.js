@@ -1,16 +1,33 @@
-// server.js
+const isDev = process.env.NODE_ENV !== 'production';
+if (!isDev) {
+  process.chdir(__dirname);
+}
 
+require('dotenv').config();
 const express = require('express');
 const ethers = require('ethers');
 const fs = require('fs');
 const { exec } = require('child_process');
 const path = require('path');
 const cors = require('cors');
-
 const app = express();
-app.use(cors({
-  origin: '*',
-}));
+
+const port = process.env.PORT || 3000;
+const animal = process.env.ANIMAL || '🐶';
+
+const corsOptions = {
+  origin: isDev ? `http://localhost:8080` : [
+    'https://superfluid-wizard.huntersworkshop.xyz',
+    'https://superfluid-wizard.luxumbra.dev',
+    'https://deploy-preview-*--hw-supertoken-contract-wizard.netlify.app'
+  ],
+  optionsSuccessStatus: 200 //  for legacy browsers
+}
+
+console.log({corsOptions, port, isDev, animal});
+
+app.use(cors(corsOptions));
+
 app.use(express.json());
 
 const contractPath = path.join(__dirname, '/contracts/Contract.sol');
@@ -49,7 +66,7 @@ app.post('/compile', async (req, res) => {
     // Write the Solidity code to a .sol file
     fs.writeFileSync(path.join(contractDir, `${name}.sol`), input);
 
-    exec('npx hardhat compile', (error, stdout, stderr) => {
+  exec('npx hardhat compile', (error, stdout, stderr) => {
       if (error) {
         console.log(`error: ${error.message}`);
         res.status(500).send({ error: error.message });
@@ -63,10 +80,11 @@ app.post('/compile', async (req, res) => {
       const artifactPath = path.join(artifactsDir, `contracts/${name}.sol/${name}.json`);
       if (fs.existsSync(artifactPath)) {
         const compiled = JSON.parse(fs.readFileSync(artifactPath, 'utf8'));
+        console.log(`Compiled ${name}!`, { compiled, stdout });
         res.send(compiled);
-      } else {
-        res.status(500).send({ error: "Compilation failed or took too long" });
+        return;
       }
+
     });
   });
 
@@ -97,4 +115,6 @@ app.post('/delete', async (req, res) => {
 
 
 // Start server
-app.listen(3000, () => console.log('Server running on port 3000'));
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`)
+});
