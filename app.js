@@ -54,7 +54,7 @@ const corsOptions = {
     'https://superfluid-wizard.luxumbra.dev',
     'https://deploy-preview-*--hw-supertoken-contract-wizard.netlify.app'
   ],
-
+  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
 }
 
 console.log({corsOptions, port, isDev, animal});
