@@ -10,21 +10,45 @@ const fs = require('fs');
 const { exec } = require('child_process');
 const path = require('path');
 const cors = require('cors');
+const e = require('express');
 const app = express();
 
 const port = process.env.PORT || 3000;
 const animal = process.env.ANIMAL || '🐶';
 
-const corsOptions = {
-  origin: isDev ? `http://localhost:8080` : [
-    'https://superfluid-wizard.huntersworkshop.xyz',
-    'https://superfluid-wizard.luxumbra.dev',
-    'https://deploy-preview-*--hw-supertoken-contract-wizard.netlify.app'
-  ],
-  optionsSuccessStatus: 200 //  for legacy browsers
+
+let corsOptions;
+// let isDomainAllowed = req.header('Origin').endsWith('huntersworkshop.xyz') || req.header('Origin').endsWith('luxumbra.dev') || req.header('Origin').endsWith('hw-supertoken-contract-wizard.netlify.app');
+let whitelist =
+  isDev ? `http://localhost:8080` : [
+  'https://supertoken-wizard.huntersworkshop.xyz',
+  'https://superfluid-wizard.huntersworkshop.xyz',
+  'https://superfluid-wizard.luxumbra.dev',
+  '--hw-supertoken-contract-wizard.netlify.app'
+  ];
+
+corsOptions = {
+  origin: function (origin, callback) {
+    if (whitelist.includes(origin) || !origin) {
+      callback(null, true)
+    } else {
+      console.log('Not allowed by CORS', { origin });
+      callback(new Error('Not allowed by CORS'));
+    }
+  }
 }
 
-console.log({corsOptions, port, isDev, animal});
+// const corsOptions = {
+//   origin: isDev ? `http://localhost:8080` : [
+//     'https://supertoken-wizard.huntersworkshop.xyz',
+//     'https://superfluid-wizard.huntersworkshop.xyz',
+//     'https://superfluid-wizard.luxumbra.dev',
+//     'https://deploy-preview-*--hw-supertoken-contract-wizard.netlify.app'
+//   ],
+
+// }
+
+console.log({origin: corsOptions.origin, port, isDev, animal});
 
 app.use(cors(corsOptions));
 
