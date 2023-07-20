@@ -10,18 +10,51 @@ const fs = require('fs');
 const { exec } = require('child_process');
 const path = require('path');
 const cors = require('cors');
+const e = require('express');
 const app = express();
 
 const port = process.env.PORT || 3000;
 const animal = process.env.ANIMAL || '🐶';
 
+
+// let isDomainAllowed = req.header('Origin').endsWith('huntersworkshop.xyz') || req.header('Origin').endsWith('luxumbra.dev') || req.header('Origin').endsWith('hw-supertoken-contract-wizard.netlify.app');
+// let whitelist =
+//   isDev ? ['http://localhost:8081'] : [
+//   'https://supertoken-wizard.huntersworkshop.xyz',
+//   'https://superfluid-wizard.huntersworkshop.xyz',
+//   'https://superfluid-wizard.luxumbra.dev',
+//   '--hw-supertoken-contract-wizard.netlify.app'
+//   ];
+
+// const corsOptionsDelegate = function (req, callback) {
+//   let corsOptions;
+//   let origin = req.header('Origin');
+
+//   let isWhitelisted = whitelist.some((allowedOrigin) => {
+//     if (allowedOrigin === origin) return true;
+//     if (origin && origin.endsWith(allowedOrigin)) return true;
+
+//     return false;
+//   });
+
+//   if (isWhitelisted) {
+//     corsOptions = { origin: true } // reflect (enable) the requested origin in the CORS response
+//   } else {
+//     corsOptions = { origin: false } // disable CORS for this request
+
+//   }
+
+//   callback(null, corsOptions) // callback expects two parameters: error and options
+// }
+
 const corsOptions = {
-  origin: isDev ? `http://localhost:8080` : [
+  origin: isDev ? ['http://localhost:8080'] : [
+    'https://supertoken-wizard.huntersworkshop.xyz',
     'https://superfluid-wizard.huntersworkshop.xyz',
     'https://superfluid-wizard.luxumbra.dev',
     'https://deploy-preview-*--hw-supertoken-contract-wizard.netlify.app'
   ],
-  optionsSuccessStatus: 200 //  for legacy browsers
+  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
 }
 
 console.log({corsOptions, port, isDev, animal});
